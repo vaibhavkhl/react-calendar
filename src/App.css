@@ -22,6 +22,19 @@
   color: #61dafb;
 }
 
+.appointment-container {
+  float: left;
+  position: relative;
+  padding-left: 10px;
+  padding-right: 10px;
+  width: 600px;
+  height: 720px;
+}
+
+.appointment {
+
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
