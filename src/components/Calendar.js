@@ -9,10 +9,10 @@ class Calendar extends Component {
     // step 1
     let overlappingEvents = findOverlappingEvents(events)
     //step 2
-    let allOverlappingEvents = setEventsTogether(overlappingEvents)
+    //let allOverlappingEvents = setEventsTogether(overlappingEvents)
     // step 3
-    let eventsWithCount = setCountAndOrderToEvents(events, allOverlappingEvents)
-    let eventsWithDimensions = setDimensionsToEvents(eventsWithCount)
+    let eventsWithWidth = setWidthAndOrderToEvents(events, overlappingEvents)
+    let eventsWithDimensions = setDimensionsToEvents(eventsWithWidth)
 
     let appointments = []
     events.forEach(event => {
@@ -65,6 +65,7 @@ function compareEventToOtherEvents(eventToCompare, events) {
   return eventsThatOverlapWithEventToCompare
 }
 
+/* step 2 not needed anymore
 
 // step 2
 // in this step we want all eevents together that overlap
@@ -118,39 +119,58 @@ function compareWithPreviousArrays(arrayToCompare, array, index) {
 
 }
 
+*/
+
 // step 3
 // now all the eventids that overlaps are together in the array with first overlaping event
 // so now we can assign count(which is length of array of ids) to each event which determines width
 // and order which determines horizontal position
-function setCountAndOrderToEvents(events, copy) {
+function setWidthAndOrderToEvents(events, copy) {
   copy.forEach((arr) => {
-    setCountAndOrder(arr)
+    setWidthAndOrder(arr)
   })
 
-  function setCountAndOrder(arrayOfIds) {
+  function setWidthAndOrder(arrayOfIds) {
       let order = 0
+      let skipArray = false
+      let width
 
       arrayOfIds.forEach((id, index) => {
         let event = events[id - 1]
-        if (event.count) {
+        if (event.width || skipArray) {
+          // if the element has width we want to skip it, and if its first element
+          // in the array skip all other elements of the array.
+          // we will cover them in their own array
+          if (index == 0) {
+            skipArray = true
+          }
           return
         }
-        event.count = arrayOfIds.length
+        width = width || findWidth(arrayOfIds, events)
+        event.width = width
         event.order = order
         order += 1
       })
 
   }
 
-  console.log(events)
+  console.log('events with width and order', events)
   return events
+}
+
+function findWidth(arrayOfIds, events) {
+  // we call this function for teh first event in the array.
+  // if any overlapping event which occurs before this event and already has width
+  // then we return this width
+  let event = events[Math.min(...arrayOfIds)]
+  return event.width || 600/arrayOfIds.length
 }
 
 function setDimensionsToEvents(events) {
   events.forEach(event => {
     event.top = event.start
     event.height = event.end - event.start
-    event.width = 600/event.count
+    //event.width = 600/event.count
     event.left = event.width * event.order + 10 //for padding
   })
   return events
